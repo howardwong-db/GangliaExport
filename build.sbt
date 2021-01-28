@@ -1,10 +1,26 @@
 name := "GangliaExport"
 version := "1.0"
 scalaVersion := "2.11.12"
-val sparkVersion = "2.4.5"
-// Note the dependencies are provided
-libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion % "provided"
-libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion % "provided"
+val sparkVersion2 = "2.4.5"
+val sparkVersion3 = "3.0.1"
+crossScalaVersions := Seq("2.11.12", "2.12.7")
+
+libraryDependencies := {
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, scalaMajor)) if scalaMajor == 12 =>
+      libraryDependencies.value ++ Seq(
+        "org.apache.spark" %% "spark-core" % sparkVersion3 % "provided",
+        "org.apache.spark" %% "spark-sql" % sparkVersion3 % "provided")
+    case Some((2, scalaMajor)) if scalaMajor == 11 =>
+      libraryDependencies.value ++ Seq(
+        "org.apache.spark" %% "spark-core" % sparkVersion2 % "provided",
+        "org.apache.spark" %% "spark-sql" % sparkVersion2 % "provided")
+    case _ => Seq()
+  }
+}
+
+//libraryDependencies += "org.apache.spark" %% "spark-core" % sparkVersion % "provided"
+//libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion % "provided"
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.0" % "test"
 libraryDependencies += "com.github.tomakehurst" % "wiremock-standalone" % "2.23.2" % "test"
 
