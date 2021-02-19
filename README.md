@@ -74,6 +74,8 @@ root
  |-- reportingDate: date (nullable = true)
 ```
 
+Use a sample [notebook](./notebooks/GangliaExport.scala) to try this.
+
 ### Sample Queries
 Create a temporary view table
 ```scala
