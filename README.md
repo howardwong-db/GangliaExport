@@ -20,6 +20,8 @@ Other options to monitor cluster utilization:
 | Spark 2.x | 2.11 | yes |
 | Spark 3.x | 2.12 | yes |
 
+Python support is TBD
+
 ## Build
 
 Package
@@ -36,7 +38,7 @@ sbt +test
 ```
 
 ## Usage
-Load the ganglia export lib into the all purpose cluster or add as a dependency lib in your automated job
+Load the ganglia export lib into the ```all purpose cluster``` or add as a dependency lib in your automated job
 Add the following code to your Spark application:
 ```scala
 import com.databricks.gangliaexport.GangliaExport
@@ -71,3 +73,89 @@ root
  |-- metricVal: double (nullable = true)
  |-- reportingDate: date (nullable = true)
 ```
+
+### Sample Queries
+Create a temporary view table
+```scala
+val metrics = spark.read.format("delta").load("/tmp/howard.wong@databricks.com/gangliametricstest")
+metrics.createOrReplaceTempView("metrics")
+```
+CPU Load
+```roomsql
+%sql
+select
+  from_unixtime(reportingTime) as reportingTime,
+  metricName,
+  (100 - metricVal) as cpupercent
+from
+  metrics
+where
+  metricName = "cpu_idle"
+  and clusterName = 'exporttest'
+order by
+  reportingTime
+```
+![](./src/main/resources/cpuload.png)
+CPU Usages
+```roomsql
+%sql
+select
+  *
+from
+  (
+    select
+      from_unixtime(reportingTime) as reportingTime,
+      clusterName,
+      metricName,
+      metricVal
+    from
+      metrics
+    where
+      metricName like 'cpu%'
+      and metricUnits = '%'
+      and clusterName = 'exporttest'
+      and reportingTime BETWEEN DATE '2020-01-01' AND DATE '2021-01-31'
+  ) pivot (
+    avg(metricVal) for metricName in (
+      'cpu_idle' cpu_idle,
+      'cpu_system' cpu_system,
+      'cpu_user' cpu_user,
+      'cpu_nice' cpu_nice
+    )
+  )
+order by
+  reportingTime
+```
+![](./src/main/resources/cpuusage.png)
+
+Memory Usage
+```roomsql
+%sql
+select
+  *
+from
+  (
+    select
+      from_unixtime(reportingTime) as reportingTime,
+      clusterName,
+      metricName,
+      metricVal
+    from
+      metrics
+    where
+      metricName like 'cpu%'
+      and metricUnits = '%'
+      and clusterName = 'exporttest'
+      and reportingTime BETWEEN DATE '2020-01-01' AND DATE '2021-01-31'
+  ) pivot (
+    avg(metricVal) for metricName in (
+      'cpu_idle' cpu_idle,
+      'cpu_system' cpu_system,
+      'cpu_user' cpu_user,
+      'cpu_nice' cpu_nice
+    )
+  )
+order by
+  reportingTime
+```
+![](./src/main/resources/memusage.png)
