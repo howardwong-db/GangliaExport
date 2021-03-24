@@ -22,17 +22,45 @@ metrics.createOrReplaceTempView("metrics")
 
 // COMMAND ----------
 
+// DBTITLE 1,CPU Load
 // MAGIC %sql
-// MAGIC select from_unixtime(reportingTime) as reportingTime, metricName, (100 - metricVal) as cpupercent from metrics where metricName = "cpu_idle" and clusterName = 'exporttest' order by reportingTime
+// MAGIC select
+// MAGIC   from_unixtime(reportingTime) as reportingTime,
+// MAGIC   metricName,
+// MAGIC   (100 - metricVal) as cpupercent
+// MAGIC from
+// MAGIC   metrics
+// MAGIC where
+// MAGIC   metricName = "cpu_idle"
+// MAGIC   and clusterName = 'exporttest'
+// MAGIC order by
+// MAGIC   reportingTime
 
 // COMMAND ----------
 
+// DBTITLE 1,CPU usage - Chart using series grouping by metricName
 // MAGIC %sql
-// MAGIC select * from metrics where metricName like "cpu%" order by reportingTime
+// MAGIC select
+// MAGIC   from_unixtime(reportingTime) as reportingTime,
+// MAGIC   clusterName,
+// MAGIC   metricName,
+// MAGIC   metricVal
+// MAGIC from
+// MAGIC   metrics
+// MAGIC where
+// MAGIC   metricName like 'cpu%'
+// MAGIC   and metricUnits = '%'
+// MAGIC   and clusterName = 'exporttest'
+// MAGIC   and reportingDate BETWEEN DATE '2020-01-01'
+// MAGIC   AND DATE '2021-01-31'
+// MAGIC order by
+// MAGIC   reportingTime,
+// MAGIC   clusterName,
+// MAGIC   metricName
 
 // COMMAND ----------
 
-// DBTITLE 1,CPU Usage
+// DBTITLE 1,CPU Usage - Chart using pivot (metricVal from rows to columns)
 // MAGIC %sql
 // MAGIC select
 // MAGIC   *
@@ -49,7 +77,8 @@ metrics.createOrReplaceTempView("metrics")
 // MAGIC       metricName like 'cpu%'
 // MAGIC       and metricUnits = '%'
 // MAGIC       and clusterName = 'exporttest'
-// MAGIC       and reportingTime BETWEEN DATE '2020-01-01' AND DATE '2021-01-31'
+// MAGIC       and reportingDate BETWEEN DATE '2020-01-01'
+// MAGIC       AND DATE '2021-01-31'
 // MAGIC   ) pivot (
 // MAGIC     avg(metricVal) for metricName in (
 // MAGIC       'cpu_idle' cpu_idle,
@@ -63,7 +92,7 @@ metrics.createOrReplaceTempView("metrics")
 
 // COMMAND ----------
 
-// DBTITLE 1,Memory Usage
+// DBTITLE 1,Memory Usage - Chart using Pivot
 // MAGIC %sql
 // MAGIC select
 // MAGIC   *

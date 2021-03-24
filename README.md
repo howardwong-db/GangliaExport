@@ -13,7 +13,7 @@ Other options to monitor cluster utilization:
 * Monitor Ganglia while a job is running or look at Ganglia snapshots in each cluster manually
 * Install init scripts to send metrics to Datadog or Log Analytics as noted in [Manage Clusters](https://docs.databricks.com/clusters/clusters-manage.html#monitor-performance)
 
-##Support
+## Support
 
 | Spark Version | Scala Version | Supported |
 | ----- | ---- | ----- |
@@ -98,7 +98,30 @@ order by
   reportingTime
 ```
 ![](./src/main/resources/cpuload.png)
-CPU Usages
+
+CPU Usage - Chart using series grouping by meticName and avg(metricVal)
+```roomsql
+%sql
+select
+  from_unixtime(reportingTime) as reportingTime,
+  clusterName,
+  metricName,
+  metricVal
+from
+  metrics
+where
+  metricName like 'cpu%'
+  and metricUnits = '%'
+  and clusterName = 'exporttest'
+  and reportingDate BETWEEN DATE '2020-01-01'
+  AND DATE '2021-01-31'
+order by
+  reportingTime,
+  clusterName,
+  metricName
+```
+
+CPU Usages - Chart using pivot (metricVal rows to columns)
 ```roomsql
 %sql
 select
@@ -116,7 +139,7 @@ from
       metricName like 'cpu%'
       and metricUnits = '%'
       and clusterName = 'exporttest'
-      and reportingTime BETWEEN DATE '2020-01-01' AND DATE '2021-01-31'
+      and reportingDate BETWEEN DATE '2020-01-01' AND DATE '2021-01-31'
   ) pivot (
     avg(metricVal) for metricName in (
       'cpu_idle' cpu_idle,
@@ -130,7 +153,7 @@ order by
 ```
 ![](./src/main/resources/cpuusage.png)
 
-Memory Usage
+Memory Usage - Chart using pivot
 ```roomsql
 %sql
 select
