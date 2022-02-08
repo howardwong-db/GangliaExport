@@ -2,7 +2,7 @@ name := "GangliaExport"
 version := "1.0"
 scalaVersion := "2.11.12"
 val sparkVersion2 = "2.4.5"
-val sparkVersion3 = "3.0.1"
+val sparkVersion3 = "3.1.2"
 crossScalaVersions := Seq("2.11.12", "2.12.7")
 
 libraryDependencies := {
