@@ -3,7 +3,7 @@
 This package provides an alternative way to monitor Databricks cluster utilization using Ganglia Web Service on the driver node of each cluster.
 The Ganglia metrics can be exported to any Spark datasource format which can be used to analyze cluster usage.
 
-* Metrics can are saved in low cost cloud storage in any Spark format and use any Spark tools like SQL Analytics to monitor performance 
+* Metrics can be saved in cloud storage in any Spark supported format including Delta and use tools like DB SQL to monitor performance 
 * No other monitoring dependencies which reduces complexity
 * Job optimization for automated job clusters
 
@@ -20,6 +20,7 @@ Other options to monitor cluster utilization:
 | Spark 2.x | 2.11 | yes |
 | Spark 3.x | 2.12 | yes |
 
+See build file for specific Spark versions.
 Python support is TBD
 
 ## Build
@@ -38,8 +39,9 @@ sbt +test
 ```
 
 ## Usage
-Load the ganglia export lib into the ```all purpose cluster``` or add as a dependency lib in your automated job
-Add the following code to your Spark application:
+Load the ganglia export assembly lib into the ```all purpose cluster``` or add as a dependency lib in your automated job
+### Collect Metrics
+Add the following code to your Spark application or notebook:
 ```scala
 import com.databricks.gangliaexport.GangliaExport
 val f = GangliaExport.exportMetrics(spark,"delta", Map.empty[String,String],"/tmp/howard.wong@databricks.com/gangliametricstest", 30)
@@ -50,12 +52,12 @@ f.cancel(true)
 Or
 Collect as DataFrame and save:
 ```scala
-val gc = new GangliaClient(gUrl)
+val gc = new GangliaClient()
 var df = GangliaExport.collectMetrics(spark, gc)
 df.write.format("csv").partitionBy("reportingDate").mode("append").save("/tmp/testexport")
 ```
 
-Read Metrics:
+### Read Metrics
 ```scala
 val metrics = spark.read.format("delta").load("/tmp/howard.wong@databricks.com/gangliametricstest")
 ```

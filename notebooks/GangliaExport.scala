@@ -3,12 +3,23 @@
 // MAGIC # GangliaExport
 // MAGIC 
 // MAGIC https://github.com/howardwong-db/GangliaExport
+// MAGIC 
+// MAGIC Make sure that the GangliaExport lib is added to the attached cluster
 
 // COMMAND ----------
 
+// DBTITLE 1,Collect Metrics
 import com.databricks.gangliaexport.GangliaExport
-//Load the lib into the all purpose cluster
+//store in Delta format at 30 sec interval
 val f = GangliaExport.exportMetrics(spark,"delta", Map.empty[String,String],"/tmp/howard.wong@databricks.com/gangliametricstest", 30)
+
+// COMMAND ----------
+
+import org.apache.spark.sql.functions._
+//do something
+val df = spark.range(0,100000).withColumn("partBy", col("id") % 10)
+df.createOrReplaceTempView("tmptable")
+spark.sql("select sum(id) from tmptable")
 
 // COMMAND ----------
 
@@ -32,7 +43,7 @@ metrics.createOrReplaceTempView("metrics")
 // MAGIC   metrics
 // MAGIC where
 // MAGIC   metricName = "cpu_idle"
-// MAGIC   and clusterName = 'exporttest'
+// MAGIC   and clusterName = 'hwong10_2demo'
 // MAGIC order by
 // MAGIC   reportingTime
 
