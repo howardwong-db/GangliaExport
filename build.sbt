@@ -1,17 +1,20 @@
 name := "GangliaExport"
 version := "1.0"
-scalaVersion := "2.11.12"
-val sparkVersion2 = "2.4.5"
-val sparkVersion3 = "3.1.2"
-crossScalaVersions := Seq("2.11.12", "2.12.7")
+
+//Check DBR release notes on DBR system libs
+
+scalaVersion := "2.12.15"
+val sparkVersion2 = "2.4.5" //old DBR 
+val sparkVersion3 = "3.2.1" //DBR 11.3 LTS
+crossScalaVersions := Seq("2.11.12", "2.12.15")
 
 libraryDependencies := {
   CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, scalaMajor)) if scalaMajor == 12 =>
+    case Some((2, scalaMinor)) if scalaMinor == 12 =>
       libraryDependencies.value ++ Seq(
         "org.apache.spark" %% "spark-core" % sparkVersion3 % "provided",
         "org.apache.spark" %% "spark-sql" % sparkVersion3 % "provided")
-    case Some((2, scalaMajor)) if scalaMajor == 11 =>
+    case Some((2, scalaMinor)) if scalaMinor == 11 =>
       libraryDependencies.value ++ Seq(
         "org.apache.spark" %% "spark-core" % sparkVersion2 % "provided",
         "org.apache.spark" %% "spark-sql" % sparkVersion2 % "provided")

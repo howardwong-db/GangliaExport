@@ -18,7 +18,7 @@ object SparkPi {
       .appName("Spark Pi")
       .getOrCreate()
       
-    val f = GangliaExport.exportMetrics(spark,"parquet", Map.empty[String,String],"/tmp/gangliaexport", 5)
+    val f = GangliaExport.exportMetrics(spark,"delta", Map.empty[String,String],"/tmp/gangliaexport", 5)
 
     val slices = if (args.length > 0) args(0).toInt else 2
     val n = math.min(100000L * slices, Int.MaxValue).toInt // avoid overflow

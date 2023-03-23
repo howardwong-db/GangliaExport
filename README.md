@@ -1,17 +1,21 @@
 # GangliaExport
 
-This package provides an alternative way to monitor Databricks cluster utilization using Ganglia Web Service on the driver node of each cluster.
-The Ganglia metrics can be exported to any Spark datasource format which can be used to analyze cluster usage.
+This lightweight package provides an alternative way to monitor Databricks cluster utilization using Ganglia Web Service on the driver node of each cluster.
+The Ganglia metrics can be exported to any Spark datasource format which can be used to analyze cluster usages to avoid costly idle computing.
 
 * Metrics can be saved in cloud storage in any Spark supported format including Delta and use tools like DB SQL to monitor performance 
 * No other monitoring dependencies which reduces complexity
-* Job optimization for automated job clusters
+* Ideal for job optimization monitoring for automated job clusters
 
 See this [link](https://stackoverflow.com/questions/14557546/is-there-a-api-for-ganglia) for info on the Ganglia api service and xml schema.
 
 Other options to monitor cluster utilization:
 * Monitor Ganglia while a job is running or look at Ganglia snapshots in each cluster manually
 * Install init scripts to send metrics to Datadog or Log Analytics as noted in [Manage Clusters](https://docs.databricks.com/clusters/clusters-manage.html#monitor-performance)
+
+Note: 
+* UC clusters 11.3+ causes ```Missing Credential Scope``` when running on another thread using scheduled executors. (Fix/TODO)
+* Ganglia will not be avaliable on DBR 13+. This will be replaced with system tables via cluster metrics.
 
 ## Support
 
